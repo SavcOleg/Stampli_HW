@@ -1,0 +1,23 @@
+# Disney park name normalization
+# Format: {branch_value: normalized_park_name}
+
+mappings:
+  Disneyland_HongKong: "Hong Kong"
+  Disneyland_California: "California"
+  Disneyland_Paris: "Paris"
+  
+  # Variants (if any appear in data)
+  "Hong Kong Disneyland": "Hong Kong"
+  "Hong Kong": "Hong Kong"
+  HongKong: "Hong Kong"
+  HK: "Hong Kong"
+  
+  California: "California"
+  Anaheim: "California"
+  "Disneyland Anaheim": "California"
+  
+  Paris: "Paris"
+  "Disneyland Paris": "Paris"
+  
+  unknown: "Unknown"
+

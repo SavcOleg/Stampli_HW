@@ -1,0 +1,89 @@
+# Topic extraction keywords
+# Format: {topic: [keywords]}
+
+topics:
+  staff:
+    - staff
+    - employee
+    - service
+    - friendly
+    - helpful
+    - rude
+    - cast member
+    - workers
+    
+  food:
+    - food
+    - restaurant
+    - meal
+    - dining
+    - lunch
+    - dinner
+    - breakfast
+    - snack
+    - popcorn
+    - eat
+    - hungry
+    
+  crowded:
+    - crowd
+    - crowded
+    - busy
+    - packed
+    - queue
+    - line
+    - wait
+    - waiting
+    - long wait
+    
+  rides:
+    - ride
+    - rides
+    - attraction
+    - attractions
+    - roller coaster
+    - coaster
+    
+  value:
+    - price
+    - expensive
+    - cheap
+    - value
+    - cost
+    - worth
+    - money
+    - ticket
+    
+  weather:
+    - weather
+    - rain
+    - sunny
+    - hot
+    - cold
+    - humid
+    - temperature
+    
+  wait_times:
+    - wait
+    - queue
+    - line
+    - minutes
+    - hours
+    - fast pass
+    - fastpass
+    
+  cleanliness:
+    - clean
+    - dirty
+    - maintenance
+    - maintained
+    - tidy
+    
+  size:
+    - small
+    - large
+    - big
+    - huge
+    - tiny
+    - compact
+

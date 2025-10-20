@@ -1,0 +1,54 @@
+# Gold dataset for evaluation
+# Format: question, expected_topics, expected_parks, min_citations
+
+queries:
+  - question: "What do visitors from Australia say about Disneyland in Hong Kong?"
+    expected_parks: ["Hong Kong"]
+    expected_countries: ["Australia"]
+    min_citations: 3
+    category: "geographic_filtering"
+  
+  - question: "Is spring a good time to visit Disneyland?"
+    expected_seasons: ["Spring"]
+    min_citations: 3
+    category: "temporal_filtering"
+  
+  - question: "Is Disneyland California crowded in June?"
+    expected_parks: ["California"]
+    expected_months: [6]
+    min_citations: 2
+    category: "combined_filtering"
+  
+  - question: "Is the staff in Paris friendly?"
+    expected_parks: ["Paris"]
+    expected_topics: ["staff"]
+    min_citations: 3
+    category: "topic_analysis"
+  
+  - question: "What are the best rides for families with young children?"
+    expected_topics: ["rides"]
+    min_citations: 3
+    category: "general_query"
+  
+  - question: "How is the food quality at Disney parks?"
+    expected_topics: ["food"]
+    min_citations: 3
+    category: "general_query"
+  
+  - question: "Are the parks accessible for people with disabilities?"
+    expected_topics: ["accessibility", "staff"]
+    min_citations: 2
+    category: "accessibility_query"
+  
+  - question: "What do people think about the value for money?"
+    expected_topics: ["value"]
+    min_citations: 3
+    category: "value_query"
+
+# Expected metrics thresholds
+thresholds:
+  max_latency_ms: 15000  # 15 seconds
+  min_citations: 2
+  max_tokens: 2000
+  min_retrieval_recall: 0.6
+

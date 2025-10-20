@@ -1,0 +1,61 @@
+# Country normalization mappings
+# Format: {raw_value: normalized_value}
+
+mappings:
+  # Keep clean ones as-is
+  Australia: Australia
+  Canada: Canada
+  China: China
+  France: France
+  India: India
+  Singapore: Singapore
+  "United Kingdom": "United Kingdom"
+  "United States": "United States"
+  Philippines: Philippines
+  Malaysia: Malaysia
+  Japan: Japan
+  Korea: "South Korea"
+  "South Korea": "South Korea"
+  Thailand: Thailand
+  Indonesia: Indonesia
+  Vietnam: Vietnam
+  Netherlands: Netherlands
+  Germany: Germany
+  Italy: Italy
+  Spain: Spain
+  Brazil: Brazil
+  Mexico: Mexico
+  
+  # Handle UAE variants
+  "United Arab Emirates": "United Arab Emirates"
+  UAE: "United Arab Emirates"
+  "U.A.E.": "United Arab Emirates"
+  
+  # Handle Hong Kong variants
+  "Hong Kong": "Hong Kong"
+  "Hong Kong SAR": "Hong Kong"
+  HK: "Hong Kong"
+  
+  # Handle UK variants
+  UK: "United Kingdom"
+  England: "United Kingdom"
+  Scotland: "United Kingdom"
+  Wales: "United Kingdom"
+  
+  # Handle US variants
+  US: "United States"
+  USA: "United States"
+  America: "United States"
+  
+  # Handle Myanmar variants
+  "Myanmar (Burma)": "Myanmar"
+  Myanmar: "Myanmar"
+  Burma: "Myanmar"
+  
+  # Handle New Zealand
+  "New Zealand": "New Zealand"
+  NZ: "New Zealand"
+  
+  # Unknown/default
+  unknown: "Unknown"
+

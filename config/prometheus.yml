@@ -1,0 +1,23 @@
+# Prometheus configuration for Disney RAG System
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # FastAPI metrics
+  - job_name: 'disney-rag-api'
+    static_configs:
+      - targets: ['api:8000']
+    metrics_path: '/metrics'
+
+# Alerting rules (optional)
+# rule_files:
+#   - 'alerts.yml'
+
+# Alertmanager configuration (optional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
