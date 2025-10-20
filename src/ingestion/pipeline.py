@@ -18,7 +18,7 @@ class IngestionPipeline:
     
     def __init__(
         self,
-        input_csv: str = "data/raw/DisneylandReviews.csv",
+        input_csv: str = "DisneylandReviews.csv",
         output_parquet: str = "data/processed/chunks.parquet",
         lookup_dir: str = "data/lookup",
         chunk_size: int = 400,
