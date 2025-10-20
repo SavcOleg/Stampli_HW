@@ -98,11 +98,17 @@ def check_openai_key():
     """Check if OpenAI API key exists and is valid."""
     print("\nℹ️  Checking for OpenAI API key...")
     
+    import os
     env_file = Path(".env")
     api_key = None
     
-    # Try to read existing key
-    if env_file.exists():
+    # Priority 1: Check environment variable (for Streamlit Cloud secrets)
+    api_key = os.getenv('OPENAI_API_KEY')
+    if api_key:
+        print("✅ OpenAI API key found in environment")
+    
+    # Priority 2: Try to read from .env file (for local development)
+    if not api_key and env_file.exists():
         print("✅ .env file exists")
         # Extract API key from .env
         for line in env_file.read_text().splitlines():
@@ -110,9 +116,16 @@ def check_openai_key():
                 api_key = line.split('=', 1)[1].strip().strip('"').strip("'")
                 break
     
-    # If no key found, ask for it
+    # Priority 3: Interactive prompt (only for local development)
     if not api_key:
-        print("⚠️  OpenAI API key not found in .env file!")
+        # Check if running in non-interactive environment (like Streamlit Cloud)
+        if not sys.stdin or not sys.stdin.isatty():
+            print("❌ OpenAI API key not found!")
+            print("   For Streamlit Cloud: Add OPENAI_API_KEY to your app's Secrets")
+            print("   For local: Create a .env file with OPENAI_API_KEY=your-key")
+            return False
+        
+        print("⚠️  OpenAI API key not found in environment or .env file!")
         print("\nPlease enter your OpenAI API key:")
         print("(You can get one from: https://platform.openai.com/api-keys)")
         api_key = input("OpenAI API Key: ").strip()
@@ -149,13 +162,14 @@ def check_openai_key():
         print("❌ Invalid OpenAI API key!")
         print("   Please check your key at: https://platform.openai.com/api-keys")
         
-        # Ask if they want to enter a new key
-        retry = input("\nWould you like to enter a new API key? (yes/no): ").strip().lower()
-        if retry == 'yes':
-            # Remove old key and retry
-            if env_file.exists():
-                env_file.unlink()
-            return check_openai_key()
+        # Ask if they want to enter a new key (only in interactive mode)
+        if sys.stdin and sys.stdin.isatty():
+            retry = input("\nWould you like to enter a new API key? (yes/no): ").strip().lower()
+            if retry == 'yes':
+                # Remove old key and retry
+                if env_file.exists():
+                    env_file.unlink()
+                return check_openai_key()
         return False
         
     except openai.RateLimitError:

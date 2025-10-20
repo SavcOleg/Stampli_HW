@@ -181,6 +181,9 @@ fi
 # Step 4: Check if data is already prepared
 print_header "🔧 Preparing Data"
 
+# Create logs directory if it doesn't exist
+mkdir -p logs
+
 DATA_READY=false
 
 if [ -f "data/processed/chunks.parquet" ] && \
@@ -223,10 +226,7 @@ if [ "$DATA_READY" = true ]; then
     echo "  - BM25 index: $(du -h data/indices/bm25.pkl 2>/dev/null | cut -f1 || echo 'N/A')"
 fi
 
-# Step 5: Create logs directory
-mkdir -p logs
-
-# Step 6: Kill any existing processes
+# Step 5: Kill any existing processes
 print_header "🚀 Starting Services"
 
 print_info "Stopping any existing services..."
@@ -234,7 +234,7 @@ pkill -f "uvicorn src.api.app:app" 2>/dev/null || true
 pkill -f "streamlit run src/ui/app.py" 2>/dev/null || true
 sleep 2
 
-# Step 7: Start API server
+# Step 6: Start API server
 print_info "Starting FastAPI server on port 8000..."
 nohup python3 -m uvicorn src.api.app:app --host 0.0.0.0 --port 8000 > logs/api.log 2>&1 &
 API_PID=$!
@@ -249,7 +249,7 @@ else
     exit 1
 fi
 
-# Step 8: Start Streamlit UI
+# Step 7: Start Streamlit UI
 print_info "Starting Streamlit UI on port 8501..."
 nohup python3 -m streamlit run src/ui/app.py --server.port 8501 --server.headless true > logs/streamlit.log 2>&1 &
 UI_PID=$!
@@ -264,7 +264,7 @@ else
     exit 1
 fi
 
-# Step 9: Wait for services to be ready
+# Step 8: Wait for services to be ready
 print_info "Waiting for services to be ready..."
 sleep 3
 
@@ -275,7 +275,7 @@ else
     print_warning "API may still be initializing..."
 fi
 
-# Step 10: Success message
+# Step 9: Success message
 print_header "🎉 SUCCESS! Disney RAG System is Running"
 
 echo ""
