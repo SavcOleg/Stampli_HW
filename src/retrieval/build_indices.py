@@ -116,25 +116,22 @@ class IndexBuildPipeline:
         else:
             print(f"✅ FAISS Flat index already exists, skipping...")
         
-        # Build HNSW index with error handling (may cause segfault on some systems)
-        try:
-            if not self.faiss_hnsw_path.exists():
-                print(f"Building HNSW index (this may take a while)...")
-                hnsw_index = builder.build_hnsw_index(
-                    embeddings,
-                    M=16,  # Reduced from 32 to use less memory
-                    efConstruction=100,  # Reduced from 200
-                    efSearch=32  # Reduced from 64
-                )
-                builder.save_index(hnsw_index, self.faiss_hnsw_path)
-                
-                # Benchmark HNSW
-                builder.benchmark_search(hnsw_index, embeddings[:100], k=10, n_queries=100)
-            else:
-                print(f"✅ FAISS HNSW index already exists, skipping...")
-        except Exception as e:
-            print(f"⚠️  HNSW index build failed (will use Flat index): {str(e)}")
-            print(f"   This is OK - Flat index provides exact search results.")
+        # Skip HNSW index (known to cause segfaults on macOS)
+        if self.faiss_hnsw_path.exists():
+            print(f"✅ FAISS HNSW index already exists")
+        else:
+            print(f"⚠️  Skipping HNSW index build (known to cause crashes on some systems)")
+            print(f"   Using Flat index for exact search instead - still very fast!")
+            print(f"   For 123K vectors, Flat index provides <50ms search latency")
+        # Uncomment below to try HNSW at your own risk (may crash):
+        # try:
+        #     if not self.faiss_hnsw_path.exists():
+        #         print(f"Building HNSW index (this may take a while)...")
+        #         hnsw_index = builder.build_hnsw_index(embeddings, M=16, efConstruction=100, efSearch=32)
+        #         builder.save_index(hnsw_index, self.faiss_hnsw_path)
+        #         builder.benchmark_search(hnsw_index, embeddings[:100], k=10, n_queries=100)
+        # except Exception as e:
+        #     print(f"⚠️  HNSW index build failed: {str(e)}")
     
     def build_bm25_index(self, chunks_df: pd.DataFrame):
         """

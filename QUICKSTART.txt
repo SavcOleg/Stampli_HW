@@ -1,0 +1,307 @@
+🏰 DISNEY RAG SYSTEM - QUICK START GUIDE
+========================================
+
+This system answers natural language questions about Disney park reviews using
+a Retrieval-Augmented Generation (RAG) pipeline.
+
+📋 PREREQUISITES
+================
+
+1. Python 3.9+ installed
+2. OpenAI API key (for LLM generation)
+3. ~2GB disk space for data and indices
+4. Internet connection (first run only - to download models)
+
+💻 INSTALLATION & SETUP
+=======================
+
+### Option 1: Automated Quick Start (RECOMMENDED)
+
+**Mac/Linux:**
+```bash
+./quickstart.sh
+```
+
+**Windows/All Platforms:**
+```bash
+python3 quickstart.py
+```
+
+**Clean Start (Remove all generated data):**
+```bash
+./quickstart.sh clean          # Mac/Linux
+python3 quickstart.py clean    # Windows/All
+```
+
+This will:
+1. ✅ Check Python version (3.9+ required)
+2. ✅ Prompt for OpenAI API key (if not in .env)
+3. ✅ **Validate API key** (makes test API call to verify)
+4. ✅ Install all Python dependencies
+5. ✅ Process 42,656 reviews into 123,860 chunks
+6. ✅ Generate embeddings (384-dim vectors)
+7. ✅ Build FAISS + BM25 search indices
+8. ✅ Launch FastAPI server (port 8000)
+9. ✅ Launch Streamlit UI (port 8501)
+
+**Total time:** ~5-10 minutes (first run only)
+
+**Note:** The script validates your OpenAI API key BEFORE processing data,
+so you won't waste time if your key is invalid!
+
+---
+
+### Option 2: Manual Setup
+
+```bash
+# 1. Install dependencies
+pip3 install -r requirements.txt
+
+# 2. Set OpenAI API key
+export OPENAI_API_KEY="your-key-here"  # Mac/Linux
+# OR add to .env file:
+echo 'OPENAI_API_KEY="your-key-here"' > .env
+
+# 3. Process data
+make ingest           # ~2 minutes
+make build-index      # ~3-5 minutes
+
+# 4. Launch services (in separate terminals)
+make serve            # API server (localhost:8000)
+make serve-ui         # UI server (localhost:8501)
+```
+
+---
+
+### Option 3: Docker (if you have library conflicts)
+
+```bash
+docker-compose up --build
+```
+
+Then access:
+- **UI:** http://localhost:8501
+- **API:** http://localhost:8000
+- **Metrics:** http://localhost:8000/metrics
+
+---
+
+🎯 USAGE
+========
+
+### Streamlit UI (Recommended)
+
+Open: **http://localhost:8501**
+
+**Features:**
+- 💬 **Chat Tab:** Ask questions, get answers with citations
+- 📊 **Eval Tab:** View metrics, latency analysis, token usage
+- 🧪 **Testing Tab:** See gold dataset and test results
+- ⚙️ **Settings:** Adjust top_k, enable/disable filtering
+
+**Example Queries:**
+- "What do visitors from Australia say about Disneyland in Hong Kong?"
+- "Is spring a good time to visit Disneyland?"
+- "Is Disneyland California crowded in June?"
+- "Is the staff in Paris friendly?"
+
+---
+
+### FastAPI Server
+
+Open: **http://localhost:8000/docs**
+
+**Endpoints:**
+- `POST /query` - Main RAG query endpoint
+- `GET /health` - Health check
+- `GET /metrics` - Prometheus metrics
+
+**Example cURL:**
+```bash
+curl -X POST "http://localhost:8000/query" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "Is the staff friendly?",
+    "top_k": 5,
+    "enable_filtering": true
+  }'
+```
+
+---
+
+🧪 TESTING FROM SCRATCH
+========================
+
+To test the system as a brand new user would:
+
+```bash
+# 1. Clean all generated data
+./quickstart.sh clean          # Mac/Linux
+python3 quickstart.py clean    # Windows/All
+
+# 2. Run quick start again
+./quickstart.sh                # Rebuilds everything
+python3 quickstart.py
+```
+
+This removes:
+- ❌ `data/processed/embeddings.npy` (181MB)
+- ❌ `data/processed/chunks.parquet` (56MB)
+- ❌ `data/indices/faiss_flat.index` (181MB)
+- ❌ `data/indices/bm25.pkl` (90MB)
+- ❌ `data/indices/metadata.pkl` (49MB)
+
+**Note:** The raw CSV file (`DisneylandReviews.csv`) is NEVER deleted.
+
+---
+
+🛑 STOPPING SERVICES
+=====================
+
+**Quick Stop:**
+```bash
+./stop.sh
+```
+
+**Manual Stop:**
+```bash
+# Find process IDs
+lsof -ti:8000    # API server
+lsof -ti:8501    # UI server
+
+# Kill processes
+kill $(lsof -ti:8000)
+kill $(lsof -ti:8501)
+```
+
+**Docker:**
+```bash
+docker-compose down
+```
+
+---
+
+📊 SYSTEM ARCHITECTURE
+======================
+
+**Data Flow:**
+```
+CSV → Chunking → Embeddings → FAISS Index → Hybrid Search
+                                           ↓
+User Query → Query Parser → Filters → MMR → Re-ranker → LLM → Answer
+```
+
+**Tech Stack:**
+- **Embedding:** sentence-transformers/all-MiniLM-L6-v2 (384-dim)
+- **Vector Search:** FAISS Flat (exact search, L2 distance)
+- **Keyword Search:** BM25 (TF-IDF based)
+- **LLM:** GPT-4o-mini (OpenAI)
+- **API:** FastAPI + Uvicorn
+- **UI:** Streamlit
+- **Monitoring:** Prometheus + structlog
+- **Evaluation:** Retrieval@k, NDCG@10, Groundedness, Faithfulness
+
+**Key Features:**
+- 🔍 Hybrid search (semantic + keyword)
+- 🎯 MMR diversification
+- 🚀 Cross-encoder re-ranking
+- 📊 Real-time metrics
+- 💾 Response caching
+- 🔒 Rate limiting
+- 🧪 Gold dataset evaluation
+
+---
+
+📁 PROJECT STRUCTURE
+====================
+
+```
+Stampli_HW/
+├── data/
+│   ├── raw/              # DisneylandReviews.csv
+│   ├── processed/        # embeddings.npy, chunks.parquet
+│   └── indices/          # faiss_flat.index, bm25.pkl, metadata.pkl
+├── src/
+│   ├── ingestion/        # Data processing pipeline
+│   ├── retrieval/        # Search (FAISS, BM25, hybrid, MMR, re-ranker)
+│   ├── generation/       # LLM client, prompt builder
+│   ├── api/              # FastAPI server
+│   └── ui/               # Streamlit app (Chat + Eval + Testing)
+├── eval/                 # Evaluation framework + gold dataset
+├── tests/                # Unit tests
+├── quickstart.sh         # Quick start script (Mac/Linux)
+├── quickstart.py         # Quick start script (Windows/All)
+├── stop.sh               # Stop services script
+└── docker-compose.yml    # Docker setup
+```
+
+---
+
+🔧 TROUBLESHOOTING
+==================
+
+### Issue: Segmentation Fault (Exit Code 139)
+
+**Cause:** FAISS HNSW has known issues on macOS with LibreSSL
+
+**Solutions:**
+1. Use Docker (recommended): `docker-compose up`
+2. Upgrade OpenSSL: `brew install openssl@1.1 && brew link openssl@1.1 --force`
+3. Use existing data (don't rebuild): Data is already prepared!
+
+### Issue: OpenAI API Error
+
+**Cause:** Missing or invalid API key
+
+**Solution:**
+```bash
+export OPENAI_API_KEY="sk-..."  # Mac/Linux
+# OR
+echo 'OPENAI_API_KEY="sk-..."' > .env
+```
+
+### Issue: Port Already in Use
+
+**Cause:** Service already running on port 8000 or 8501
+
+**Solution:**
+```bash
+./stop.sh
+# OR
+kill $(lsof -ti:8000)
+kill $(lsof -ti:8501)
+```
+
+### Issue: urllib3 Warning (NotOpenSSLWarning)
+
+**Cause:** System using LibreSSL instead of OpenSSL
+
+**Solution:** This is just a warning - system will work fine. To fix:
+```bash
+brew install openssl@1.1
+pip uninstall urllib3
+pip install urllib3
+```
+
+---
+
+🎉 YOU'RE ALL SET!
+==================
+
+Your Disney RAG system is now running!
+
+**Access Points:**
+- 🎨 **UI:** http://localhost:8501
+- 🔌 **API:** http://localhost:8000
+- 📊 **API Docs:** http://localhost:8000/docs
+- 📈 **Metrics:** http://localhost:8000/metrics
+
+**Next Steps:**
+1. Try the example queries in the Streamlit UI
+2. Explore the Eval tab to see performance metrics
+3. Check the Testing tab for gold dataset results
+4. Read the API docs for integration
+
+**Questions?** Check DESIGN_LOG.md for architecture details.
+
+Happy querying! 🏰✨
